@@ -13,7 +13,8 @@ module.exports = (sequelize) => {
         },
         score: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            defaultValue: 0
         }
     },
     {
