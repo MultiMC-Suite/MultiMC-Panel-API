@@ -20,7 +20,7 @@ if(process.env.DB_TYPE === "sqlite"){
 const models = require('../handlers/modelHandler')(sequelize);
 
 // Foreign keys
-models.User.belongsTo(models.Group, {foreignKey: {name: "groupId", allowNull: false}});
+models.User.belongsTo(models.Group, {foreignKey: {name: "groupId", allowNull: false, defaultValue: 1}});
 models.Team.belongsTo(models.User, {foreignKey: {name: "ownerId", allowNull: false}});
 models.User.belongsTo(models.Team, {foreignKey: {name: "teamCode", allowNull: true}});
 models.Notification.belongsTo(models.User, {foreignKey: {name: "senderId", allowNull: true}});
