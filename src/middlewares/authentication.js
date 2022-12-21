@@ -7,6 +7,7 @@ module.exports = (req, res, next) => {
     if(!authHeader)
         return res.status(401).json({message: "No token provided"});
     const token = authHeader.split(" ")[1];
+    if(!token) return res.status(401).json({message: "No token provided"});
     jwt.verify(token, process.env.PRIVATE_KEY, (error, decodedToken) => {
         // If error, return 401
         if(error) return res.status(401).json({message: "Invalid token"});
@@ -14,6 +15,7 @@ module.exports = (req, res, next) => {
         const userId = decodedToken.userId;
         // Find user in database
         models.User.findOne({where: {id: userId}}).then(user => {
+            if(user === null) return res.status(404).json({message: "User not found"});
             // Set user in request
             user = user.toJSON();
             delete user.password;

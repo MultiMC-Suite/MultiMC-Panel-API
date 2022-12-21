@@ -27,7 +27,11 @@ require('./handlers/routeHandler')(app);
 // Init 404 middleware
 app.use(({res}) => res.status(404).json({message: "Unknown route"}));
 
-// Start the API
-app.listen(process.env.PORT, process.env.BIND_ADDRESS, () => {
-    console.log(`Server started on http://${process.env.BIND_ADDRESS}:${process.env.PORT}`);
-});
+if (require.main === module) {
+    // Start the API
+    app.listen(process.env.PORT, process.env.BIND_ADDRESS, () => {
+        console.log(`Server started on http://${process.env.BIND_ADDRESS}:${process.env.PORT}`);
+    });
+}
+
+module.exports = app;
