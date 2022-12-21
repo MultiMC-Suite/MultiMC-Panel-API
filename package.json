@@ -4,7 +4,7 @@
   "description": "*Check if a token is valid or not*.",
   "main": "src/app.js",
   "scripts": {
-    "test": "nodemon .",
+    "dev": "nodemon .",
     "run": "node ."
   },
   "repository": {
