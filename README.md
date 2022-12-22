@@ -11,51 +11,67 @@
 Returned payload :
 
 - **200**
-    
+
     ```json
     {
-        "userId": 0,
-        "username": "username_1",
-        "teamCode": "CODE"
+    	"id": 1,
+    	"username": "root",
+    	"groupId": 2,
+    	"teamCode": null
     }
     ```
-    
+
 - **401**
-    
-    *Invalid token*
-    
+
+  *Invalid token*
+
 
 ### POST
 
 *Get a token from a username and a code (or password).*
 
-URL settings :
+Sent payload :
 
-- username
-- code OR password
+```json
+{
+    "username": "username",
+    "code": "code"
+}
+OR
+{
+    "username": "username",
+    "password": "password"
+}
+```
 
 Returned payload :
 
 - **200**
-    
+
     ```json
     {
-        "token": "token"
+    	"user": {
+    		"id": 1,
+    		"username": "root",
+    		"groupId": 2,
+    		"teamCode": null
+    	},
+    	"token": "token"
     }
     ```
-    
+
 - **400**
-    
-    *Missing URL setting*
-    
+
+  *Missing parameters*
+
 - **401**
-    
-    *Invalid cpde or password*
-    
+
+  *Invalid code or password*
+
 - **404**
-    
-    *Username not found*
-    
+
+  *Username not found*
+
 
 ## api/users
 
@@ -68,7 +84,7 @@ Returned payload :
 Returned payload :
 
 - **200**
-    
+
     ```json
     [
         {
@@ -83,15 +99,56 @@ Returned payload :
         }
     ]
     ```
-    
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 - **404**
-    
-    *No existing users*
-    
+
+  *No existing users*
+
+
+### POST
+
+*Create a new user*
+
+Sent payload :
+
+```json
+{
+    "username": "username",
+    "code": "code"
+}
+OR
+{
+    "username": "username",
+    "password": "password"
+}
+```
+
+Returned payload :
+
+- **200**
+
+    ```json
+    {
+    	"id": 2,
+    	"username": "test",
+    	"groupId": 1,
+    	"teamCode": null,
+    	"token": "token"
+    }
+    ```
+
+- **400**
+
+  *Missing body part*
+
+- **409**
+
+  *Username already used*
+
 
 ## api/user/:id
 
@@ -104,23 +161,24 @@ Returned payload :
 Returned payload :
 
 - **200**
-    
+
     ```json
     {
-        "userId": 0,
-        "username": "username_1",
-        "teamCode": "CODE"
+    	"id": 1,
+    	"username": "root",
+    	"groupId": 2,
+    	"teamCode": null
     }
     ```
-    
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 - **404**
-    
-    *User not found*
-    
+
+  *User not found*
+
 
 ## api/teams
 
@@ -130,45 +188,64 @@ Returned payload :
 
 **Need bearer**
 
+URL settings :
+
+- complete : *Can be “id” or “users”, and add more things (like members) to be added*
+
 Returned payload :
 
 - **200**
-    
+
     ```json
     [
-        {
-            "teamName": "Team Name 1",
-            "teamCode": "CODE1",
-            "score": 2,
-            "ownerId": 0,
-            "members": [
-                1,
-                2,
-                3
-            ]
-        },
-        {
-            "teamName": "Team Name 2",
-            "teamCode": "CODE2",
-            "score": 5,
-            "ownerId": 4,
-            "members": [
-                5,
-                6,
-                7
-            ]
-        }
+    	{
+    		"code": "GW7G7",
+    		"name": "test",
+    		"score": 0,
+    		"ownerId": 1
+    	}
+    ]
+    OR
+    [
+    	{
+    		"code": "Q7ITI",
+    		"name": "test",
+    		"score": 0,
+    		"ownerId": 1,
+    		"members": [
+    			2
+    		]
+    	}
+    ]
+    OR
+    [
+    	{
+    		"code": "Q7ITI",
+    		"name": "test",
+    		"score": 0,
+    		"ownerId": 1,
+    		"owner": {
+    			"id": 1,
+    			"username": "root"
+    		},
+    		"members": [
+    			{
+    				"id": 2,
+    				"username": "test"
+    			}
+    		]
+    	}
     ]
     ```
-    
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 - **404**
-    
-    *Player is not in a team*
-    
+
+  *No teams found*
+
 
 ### POST
 
@@ -187,19 +264,20 @@ Sent payload :
 Returned payload :
 
 - **201**
-    
+
     ```json
     {
-        "teamName": "Team Name",
-        "teamCode": "CODE",
-        "ownerId": 0
+    	"score": 0,
+    	"name": "test",
+    	"code": "IFAIN3",
+    	"ownerId": 1
     }
     ```
-    
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 
 ## api/team/:code
 
@@ -212,29 +290,51 @@ Returned payload :
 Returned payload :
 
 - **200**
-    
+
     ```json
     {
-        "teamName": "Team Name",
-        "teamCode": "CODE",
-        "score": 0,
-        "ownerId": 0,
-        "members": [
-            1,
-            2,
-            3
-        ]
+    	"code": "SZFTQ",
+    	"name": "test",
+    	"score": 0,
+    	"ownerId": 1
+    }
+    OR
+    {
+    	"code": "Q7ITI",
+    	"name": "test",
+    	"score": 0,
+    	"ownerId": 1,
+    	"members": [
+    		2
+    	]
+    }
+    OR
+    {
+    	"code": "Q7ITI",
+    	"name": "test",
+    	"score": 0,
+    	"ownerId": 1,
+    	"owner": {
+    		"id": 1,
+    		"username": "root"
+    	},
+    	"members": [
+    		{
+    			"id": 2,
+    			"username": "test"
+    		}
+    	]
     }
     ```
-    
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 - **404**
-    
-    *Team not found*
-    
+
+  *Team not found*
+
 
 ## api/team/member
 
@@ -246,66 +346,66 @@ Returned payload :
 
 URL settings :
 
-- memberId
+- id
 
 Returned payload :
 
 - **204**
-    
-    *Player removed from the team*
-    
+
+  *Player removed from the team*
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
+- **403**
+
+  *User is not the team owner*
+
 - **404**
-    
-    *Member not in the team*
-    
+
+  *Member not in the team*
+
 
 ## api/team/score
 
-### PUT
+### POST
 
 *Update team score*
 
-**Need bearer + permission “score.update”**
+**Need bearer + need password authentication**
 
-URL settings :
+Sent payload :
 
-- teamCode
-- score
+```json
+{
+	"teamCode": "code",
+	"newScore": 10
+}
+```
 
 Returned payload :
 
 - **200**
-    
+
     ```json
     {
-        "teamName": "Team Name",
-        "teamCode": "CODE",
-        "score": 0,
-        "ownerId": 0,
-        "members": [
-            1,
-            2,
-            3
-        ]
+    	"message": "Score updated"
     }
     ```
-    
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 - **403**
-    
-    *Missing permission “score.update”*
-    
+
+  *Missing permission “score.update”*
+
 - **404**
-    
-    *Team not found*
-    
+
+  *Team not found*
+
 
 ## api/notification
 
@@ -315,51 +415,32 @@ Returned payload :
 
 **Need bearer**
 
-URL Settings :
-
-- userId
-
 Returned payload :
 
 - **200**
-    
+
     ```json
     [
-        {
-            "notificationId": 0,
-            "senderId": 0,
-            "receiverId": 1,
-            "notificationType": "info",
-            "content": {
-                "message": "Hello World 1"
-            },
-            "state": null
-        },
-        {
-            "notificationId": 1,
-            "senderId": 0,
-            "receiverId": 1,
-            "notificationType": "choice",
-            "content": {
-                "message": "Player 0 invited you to it's team"
-            },
-            "state": "waiting"
-        }
+    	{
+    		"id": 1,
+    		"type": "info",
+    		"jsonContent": {
+    			"message": "Message content"
+    		},
+    		"senderId": null,
+    		"receiverId": 1
+    	}
     ]
     ```
-    
-- **204**
-    
-    *User found, but no notifications*
-    
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 - **404**
-    
-    *User not found*
-    
+
+  *No notices found*
+
 
 ### POST
 
@@ -371,27 +452,34 @@ Sent payload :
 
 ```json
 {
-    "notificationId": 0,
-    "senderId": 0,
-    "receiverId": 0,
-    "notificationType": "info",
-    "content": {
-        "message": "Hello World"
-    },
-    "state": null
+	"targetId": 2,
+	"type": "info",
+	"content": {
+		"message": "Message content"
+	}
 }
 ```
 
 Returned payload :
 
-- **204**
-    
-    *Notification created*
-    
+- **201**
+
+    ```json
+    {
+    	"id": 1,
+    	"senderId": 1,
+    	"receiverId": 2,
+    	"type": "info",
+    	"jsonContent": {
+    		"message": "Message content"
+    	}
+    }
+    ```
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 
 ## api/notification/accept
 
@@ -408,17 +496,17 @@ URL settings :
 Returned payload :
 
 - **204**
-    
-    *Notification accepted*
-    
+
+  *Notification accepted*
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 - **404**
-    
-    *Notification not found*
-    
+
+  *Notification not found*
+
 
 ## api/notification/decline
 
@@ -435,13 +523,13 @@ URL settings :
 Returned payload :
 
 - **204**
-    
-    *Notification declined*
-    
+
+  *Notification declined*
+
 - **401**
-    
-    *Unauthorized*
-    
+
+  *Unauthorized*
+
 - **404**
-    
-    *Notification not found*
+
+  *Notification not found*
