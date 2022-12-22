@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const {models} = require("../database/sequelize");
-const encryption = require("../tools/encryption");
 
 module.exports = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -18,6 +17,7 @@ module.exports = (req, res, next) => {
             if(user === null) return res.status(404).json({message: "User not found"});
             // Set user in request
             user = user.toJSON();
+            if(user.password !== null) user.hasPassword = true;
             delete user.password;
             req.user = user;
             // Get user permissions and set them in request
