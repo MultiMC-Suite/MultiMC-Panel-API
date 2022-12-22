@@ -39,6 +39,10 @@ async function getMessage(noticeType, content){
             const userName = (await models.User.findOne({where: {id: content.targetId}})).username;
             return userName + " a quitté votre équipe !";
         }
+        case "decline": {
+            const userName = (await models.User.findOne({where: {id: content.targetId}})).username;
+            if(content.noticeType === "invite") return userName + " a décliné votre invitation!";
+        }
         default: {
             return "Unknown notification type";
         }

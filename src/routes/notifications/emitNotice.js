@@ -30,11 +30,12 @@ module.exports = (app) => {
 }
 
 async function checkNotice(res, noticeType, content){
-    if(!["info", "score", "invite", "join", "leave"].includes(noticeType)) return res.status(400).json({message: "Invalid type"});
+    if(!["info", "score", "invite", "join", "leave", "decline"].includes(noticeType)) return res.status(400).json({message: "Invalid type"});
     // Check content to verify if all require fields dot each type are present
     if(noticeType === "info" && !content.message) return res.status(400).json({message: "Missing message field in content"});
     if(noticeType === "score" && (!content.oldScore || !content.newScore)) return res.status(400).json({message: "Missing oldScore or newScore fields in content"});
     if(noticeType === "invite" && !content.teamCode) return res.status(400).json({message: "Missing teamCode field in content"});
     if((noticeType === "join" || noticeType === "leave") && (!content.teamCode || !content.targetId)) return res.status(400).json({message: "Missing teamCode or targetId field in content"});
+    if(noticeType === "decline" && (!content.noticeType || !content.targetId)) return res.status(400).json({message: "Missing teamCode or targetId field in content"});
     return 0;
 }
