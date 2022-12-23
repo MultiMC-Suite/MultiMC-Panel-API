@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize')
+const { Sequelize } = require('sequelize')
 const encryption = require("../tools/encryption");
 
 let sequelize;
@@ -29,10 +29,11 @@ models.Notification.belongsTo(models.User, {foreignKey: {name: "receiverId", all
 sequelize.sync({force: process.env.DB_FORCE_INIT === "true"}).then(_ => {
     console.log('Database synchronized');
     if(process.env.DB_INIT === "true"){
-        isRootUserExist().then(exist => {
+        isRootUserExist().then(async exist => {
             if(!exist){
                 console.log("Adding defaults");
-                addDefaults();
+                await addRoot();
+                await addDefaults();
             }
         })
     }
@@ -40,8 +41,8 @@ sequelize.sync({force: process.env.DB_FORCE_INIT === "true"}).then(_ => {
 const isRootUserExist = async () => {
     return await models.User.findOne({where: {username: "root"}}) !== null;
 }
-const addDefaults = async () => {
-    models.Group.findOne({where: {name: "default"}}).then(group => {
+async function addRoot() {
+    await models.Group.findOne({where: {name: "default"}}).then(group => {
         if(group === null){
             models.Group.create({
                 name: "default",
@@ -49,7 +50,7 @@ const addDefaults = async () => {
             })
         }
     });
-    models.Group.findOne({where: {name: "root"}}).then(group => {
+    await models.Group.findOne({where: {name: "root"}}).then(group => {
         if(group === null){
             models.Group.create({
                 name: "root",
@@ -57,7 +58,7 @@ const addDefaults = async () => {
             })
         }
     });
-    models.User.findOne({where: {username: "root"}}).then(async (user) => {
+    await models.User.findOne({where: {username: "root"}}).then(async (user) => {
         if(user === null){
             const encryptedPassword = await encryption.encrypt(process.env.ROOT_PASSWORD);
             const group = await models.Group.findOne({where: {name: "root"}});
@@ -69,6 +70,32 @@ const addDefaults = async () => {
         }
     });
     console.log("Root user created");
+}
+
+async function addDefaults(){
+    const users = [
+        await models.User.create({
+            username: "User 1",
+            password: null,
+            groupId: 1,
+            teamCode: null
+        }),
+        await models.User.create({
+            username: "User 2",
+            password: null,
+            groupId: 1,
+            teamCode: null
+        })
+    ]
+    await models.Team.create({
+        name: "Team 1",
+        code: "TEAM1",
+        ownerId: 1,
+        score: 15
+    })
+    for(const user of users){
+        await models.User.update({teamCode: "TEAM1"}, {where: {id: user.id}})
+    }
 }
 
 module.exports = {
