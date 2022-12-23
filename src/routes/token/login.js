@@ -1,5 +1,4 @@
 const encryption = require("../../tools/encryption");
-const jwt = require("jsonwebtoken");
 const {models} = require('../../database/sequelize');
 
 module.exports = (app) => {
@@ -14,16 +13,16 @@ module.exports = (app) => {
                     if(!result) return res.status(401).json({message: "Invalid password"});
                     const jsonUser = user.toJSON();
                     delete jsonUser.password;
-                    jsonUser.token = encryption.encodeToken(user.id);
-                    return res.status(200).json(jsonUser);
+                    const token = encryption.encodeToken(user.id);
+                    return res.status(200).json({user: jsonUser, token});
                 })
             }else if(req.body.code === process.env.CODE){
                 if(user.password !== null) return res.status(401).json({message: "User has a password authentication"})
                 // Code authentication
                 const jsonUser = user.toJSON();
                 delete jsonUser.password;
-                jsonUser.token = encryption.encodeToken(user.id);
-                return res.status(200).json(jsonUser);
+                const token = encryption.encodeToken(user.id);
+                return res.status(200).json({user: jsonUser, token});
             }else return res.status(401).json({message: "Invalid code"});
         }).catch(error => {
             // Database error
