@@ -26,7 +26,7 @@ async function declineInvite(notice, userId){
         senderId: userId,
         receiverId: sender.id,
         type: "decline",
-        jsonContent: {
+        content: {
             noticeType: "invite",
             targetId: userId
         }

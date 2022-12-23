@@ -90,7 +90,7 @@ async function addDefaults(){
     await models.Team.create({
         name: "Team 1",
         code: "TEAM1",
-        ownerId: 1,
+        ownerId: 2,
         score: 15
     })
     for(const user of users){

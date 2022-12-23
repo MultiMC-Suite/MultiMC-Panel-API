@@ -19,7 +19,7 @@ module.exports = (app) => {
 }
 
 async function acceptInvite(notice, userId){
-    const teamCode = notice.jsonContent.teamCode;
+    const teamCode = notice.content.teamCode;
     await notice.destroy();
     // Delete all other invites send to this user
     const otherInvites = await models.Notification.findAll({where: {receiverId: userId, type: "invite"}});
@@ -35,7 +35,7 @@ async function acceptInvite(notice, userId){
         await models.Notification.create({
             receiverId: member.id,
             type: "join",
-            jsonContent: {
+            content: {
                 teamCode: teamCode,
                 targetId: userId
             }

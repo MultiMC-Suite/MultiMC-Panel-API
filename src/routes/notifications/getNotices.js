@@ -9,7 +9,7 @@ module.exports = (app) => {
             const finalNotices = [];
             for(let notice of notices){
                 notice = notice.toJSON();
-                notice.jsonContent.message = await getMessage(notice.type, notice.jsonContent);
+                notice.content.message = await getMessage(notice.type, notice.content);
                 finalNotices.push(notice);
             }
             res.status(200).json(finalNotices);

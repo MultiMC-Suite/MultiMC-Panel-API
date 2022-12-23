@@ -14,15 +14,10 @@ module.exports = (app) => {
                     delete user.password;
                     delete user.teamCode;
                     delete user.groupId;
-                    if(user.id === team.ownerId){
-                        if(req.query.complete === "users")
-                            team.owner = user;
-                    }else{
-                        if(req.query.complete === "users")
-                            members.push(user);
-                        else
-                            members.push(user.id);
-                    }
+                    if(req.query.complete === "users")
+                        members.push(user);
+                    else
+                        members.push(user.id);
                 }
                 team.members = members;
                 return res.status(200).json(team);

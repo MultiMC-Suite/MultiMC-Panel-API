@@ -19,7 +19,7 @@ module.exports = (app) => {
                             senderId: req.user.id,
                             receiverId: user.id,
                             type: "score",
-                            jsonContent: {
+                            content: {
                                 teamCode: teamCode,
                                 newScore: newScore,
                                 oldScore: oldScore

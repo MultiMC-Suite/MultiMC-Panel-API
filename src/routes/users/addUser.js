@@ -12,13 +12,29 @@ module.exports = (app) => {
         if (password)
             encryptedPassword = await encryption.encrypt(password);
         const code = req.body.code;
+        // Check code if present
+        if(code)
+            if(code !== process.env.CODE) return res.status(401).json({message: "Invalid code"});
         models.User.findOne({where: {username}}).then(user => {
             if (user !== null) return res.status(409).json({message: "Username already exists"});
             models.User.create({username, password: encryptedPassword, code}).then(user => {
-                axios.post("http://localhost:3000/api/token", {username, password}).then(response => {
+                let data;
+                if(encryptedPassword){
+                    data = {
+                        username,
+                        password
+                    }
+                }else{
+                    data = {
+                        username,
+                        code
+                    }
+                }
+                axios.post(`http://${process.env.BIND_ADDRESS}:${process.env.PORT}/api/token`, data).then(response => {
                     return res.status(201).json(response.data);
                 }).catch(error => {
-                    return res.status(500).json({message: "Error with database when login in the new user", data: error});
+                    console.log(error);
+                    return res.status(500).json({message: "Error with database when login in the new user", data: error.data});
                 });
             }).catch(error => {
                 return res.status(500).json({message: "Error with database when adding new user", data: error});

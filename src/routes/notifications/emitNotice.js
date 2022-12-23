@@ -16,7 +16,7 @@ module.exports = (app) => {
                 senderId: senderId,
                 receiverId: receiverId,
                 type: type,
-                jsonContent: content,
+                content: content,
 
             }).then(notice => {
                 res.status(201).json(notice);
