@@ -3,9 +3,8 @@ const auth = require("../../../middlewares/authentication");
 
 module.exports = (app) => {
     app.delete("/api/teams/members/:id", auth, async (req, res) => {
-        const userId = req.user.id + "";
-        const targetId = req.params.id;
-        console.log(userId, targetId);
+        const userId = parseInt(req.user.id);
+        const targetId = parseInt(req.params.id);
         // Check if user is team owner
         models.User.findOne({where: {id: userId}}).then(user => {
             if(!user) return res.status(404).json({message: "User not found"});
@@ -20,7 +19,19 @@ module.exports = (app) => {
                     if(target.teamCode !== teamCode) return res.status(404).json({message: "User is not in your team"});
                     // Remove user from team
                     target.teamCode = null;
-                    target.save().then(() => {
+                    target.save().then(async () => {
+                        // Send leave notification to all team members
+                        const teamMembers = await models.User.findAll({where: {teamCode: teamCode}});
+                        for(let member of teamMembers){
+                            await models.Notification.create({
+                                receiverId: member.id,
+                                type: "leave",
+                                content: {
+                                    teamCode: teamCode,
+                                    targetId: targetId
+                                }
+                            });
+                        }
                         return res.status(204).json({message: "User removed from team"});
                     });
                 });

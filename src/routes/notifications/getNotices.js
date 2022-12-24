@@ -9,8 +9,13 @@ module.exports = (app) => {
             const finalNotices = [];
             for(let notice of notices){
                 notice = notice.toJSON();
-                notice.content.message = await getMessage(notice.type, notice.content);
-                finalNotices.push(notice);
+                const message = await getMessage(notice.type, notice.content);
+                if(message === 1){
+                    await models.Notification.destroy({where: {id: notice.id}});
+                }else{
+                    notice.content.message = message;
+                    finalNotices.push(notice);
+                }
             }
             res.status(200).json(finalNotices);
         }).catch(err => {
@@ -28,7 +33,9 @@ async function getMessage(noticeType, content){
             return "Votre score est passé de " + content.oldScore + " points à " + content.newScore + " points !";
         }
         case "invite": {
-            const teamName = (await models.Team.findOne({where: {code: content.teamCode}})).name;
+            const team = await models.Team.findOne({where: {code: content.teamCode}});
+            if(!team) return 1;
+            const teamName = team.name;
             return "Vous avez été invité à rejoindre l'équipe " + teamName + " !";
         }
         case "join": {

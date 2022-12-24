@@ -12,7 +12,12 @@ module.exports = (app) => {
                 if(team !== null) return res.status(400).json({message: "Team already exists"});
                 const teamCode = Math.random().toString(36).substring(2, 7).toUpperCase();
                 models.Team.create({name: teamName, code: teamCode, ownerId: userId}).then(team => {
-                    user.setTeam(team).then(() => {
+                    user.setTeam(team).then(async () => {
+                        // Remove all invites send to this user
+                        const invites = await models.Notification.findAll({where: {receiverId: userId, type: "invite"}});
+                        for(let invite of invites){
+                            await invite.destroy();
+                        }
                         return res.status(201).json(team);
                     }).catch(error => {
                         return res.status(500).json({message: "Error with database", data: error});

@@ -10,7 +10,8 @@ module.exports = (app) => {
             if(notice.receiverId !== userId) return res.status(403).json({message: "You can't accept this notification"});
             if(!["invite"].includes(notice.type)) return res.status(400).json({message: "This notification can't be accepted"});
             if(notice.type === "invite"){
-                acceptInvite(notice, userId).then(() => {
+                acceptInvite(notice, userId).then(state => {
+                    if(state === 1) return res.status(400).json({message: "You are already in a team"});
                     res.status(200).json({message: "Invite accepted"});
                 });
             }
@@ -19,6 +20,9 @@ module.exports = (app) => {
 }
 
 async function acceptInvite(notice, userId){
+    // Check if user is already in a team
+    const user = await models.User.findOne({where: {id: userId}});
+    if(user.teamCode !== null) return 1;
     const teamCode = notice.content.teamCode;
     await notice.destroy();
     // Delete all other invites send to this user
@@ -26,7 +30,6 @@ async function acceptInvite(notice, userId){
     for(let otherInvite of otherInvites)
         await otherInvite.destroy();
     // Update user to set his the good team
-    const user = await models.User.findOne({where: {id: userId}});
     user.teamCode = teamCode;
     await user.save();
     // Send join notification to all team members
@@ -41,4 +44,5 @@ async function acceptInvite(notice, userId){
             }
         });
     }
+    return 0;
 }
