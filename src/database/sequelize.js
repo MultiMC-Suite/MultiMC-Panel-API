@@ -28,15 +28,16 @@ models.Notification.belongsTo(models.User, {foreignKey: {name: "receiverId", all
 
 sequelize.sync({force: process.env.DB_FORCE_INIT === "true"}).then(_ => {
     console.log('Database synchronized');
-    if(process.env.DB_INIT === "true"){
-        isRootUserExist().then(async exist => {
-            if(!exist){
-                console.log("Adding defaults");
-                await addRoot();
+    isRootUserExist().then(async exist => {
+        if(!exist){
+            console.log("Adding root user");
+            await addRoot();
+            if(process.env.DB_INIT === "true"){
+                console.log("Adding default data");
                 await addDefaults();
             }
-        })
-    }
+        }
+    })
 });
 const isRootUserExist = async () => {
     return await models.User.findOne({where: {username: "root"}}) !== null;
