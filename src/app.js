@@ -1,6 +1,15 @@
 require('dotenv').config()
 const express = require('express');
 
+const https = require('https');
+const fs = require('fs');
+
+// Read SSL certificate and key
+const options = {
+    key: fs.readFileSync('./ssl/key.pem'),
+    cert: fs.readFileSync('./ssl/cert.pem')
+};
+
 // Middlewares
 const logger = require('morgan');
 const bodyParser = require('body-parser');
@@ -28,9 +37,9 @@ require('./handlers/routeHandler')(app);
 app.use(({res}) => res.status(404).json({message: "Unknown route"}));
 
 if (require.main === module) {
-    // Start the API
-    app.listen(process.env.PORT, process.env.BIND_ADDRESS, () => {
-        console.log(`Server started on http://${process.env.BIND_ADDRESS}:${process.env.PORT}`);
+    // Start the API with https
+    https.createServer(options, app).listen(process.env.PORT, process.env.BIND_ADDRESS, () => {
+        console.log(`Server started on https://${process.env.BIND_ADDRESS}:${process.env.PORT}`);
     });
 }
 
